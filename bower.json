@@ -1,0 +1,12 @@
+{
+	"dependencies": {
+		"modernizr": "*",
+		"jquery": "*",
+		"normalize-css": "*"
+	},
+	"overrides" : {
+		"modernizr" : {
+			"main" : "modernizr.js"
+		}
+	}
+}
