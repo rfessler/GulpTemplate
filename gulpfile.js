@@ -15,7 +15,7 @@ var gulp = require('gulp'),		// gulp core
 	clean = require('gulp-clean'),
 	stripDebug = require('gulp-strip-debug'),
 	sass = require('gulp-ruby-sass'),					// sass compiler
-	autoprefix = require('gulp-autoprefixer'),			// sets missing browserprefixes
+	autoprefixer = require('gulp-autoprefixer'),			// sets missing browserprefixes
 	minifycss = require('gulp-minify-css'),             // minify the css files
 	concat = require('gulp-concat'),					// concatinate js
 	jshint = require('gulp-jshint'),					// check if js is ok
@@ -77,10 +77,19 @@ var target = {
 *******************************************************************************/
 gulp.task('sass', function() {
 	gulp.src(['src/assets/scss/kickoff.scss'])
+		.pipe(plumber())
 		.pipe(sass({
 			style: 'expanded',
 			lineNumbers: true
 		}))
+		.pipe(autoprefixer(
+            'last 2 version',
+            '> 1%',
+            'ie 8',
+            'ie 9',
+            'ios 6',
+            'android 4'
+		))
 		.pipe(rename(pkg.name + '.css'))
 		.pipe(gulp.dest(path.cssDist))
 		.pipe(rename(pkg.name + '.min.css'))
