@@ -4,23 +4,25 @@
 1. DEPENDENCIES
 *******************************************************************************/
 // Include gulp
-var gulp = require('gulp'),
+var gulp = require('gulp'),		// gulp core
 
 // Include Plugins
 	pkg = require('./package.json'),
 	bower = require('gulp-bower'),
 	bowerFiles = require("gulp-bower-files"),
+	plumber = require('gulp-plumber'),                  // disable interuption
 	util = require('gulp-util'),
 	clean = require('gulp-clean'),
 	stripDebug = require('gulp-strip-debug'),
-	sass = require('gulp-ruby-sass'),
-	autoprefix = require('gulp-autoprefixer'),
-	uglify = require('gulp-uglify'),
-	concat = require('gulp-concat'),
-	jshint = require('gulp-jshint'),
+	sass = require('gulp-ruby-sass'),					// sass compiler
+	autoprefix = require('gulp-autoprefixer'),			// sets missing browserprefixes
+	minifycss = require('gulp-minify-css'),             // minify the css files
+	concat = require('gulp-concat'),					// concatinate js
+	jshint = require('gulp-jshint'),					// check if js is ok
 	stylish = require('jshint-stylish'),                // make errors look good in shell
-	uglify = require('gulp-uglify'),
-	rename = require('gulp-rename'),
+	uglify = require('gulp-uglify'),					// uglifies the js
+	rename = require('gulp-rename'),					// rename files
+	browserSync = require('browser-sync'),              // inject code to all devices
 	lr = require('tiny-lr'),
 	server = lr()
 ;
@@ -118,11 +120,22 @@ gulp.task('js-concat', function() {
 });
 
 
+/*******************************************************************************
+5. BROWSER SYNC
+*******************************************************************************/
 
+gulp.task('browser-sync', function() {
+    browserSync.init(['dist/assets/css/*.css', 'dist/assets/js/*.js'], {        // files to inject
+        proxy: {
+            host: 'localhost',                          // development server
+            port: '19000'                                // development server port
+        }
+    });
+});
 
 
 /*******************************************************************************
-5. GULP TASKS
+6. GULP TASKS
 *******************************************************************************/
 // default task
 gulp.task('default', function(){
@@ -154,7 +167,6 @@ gulp.task('cleanse', function(){
 gulp.task('scripts', function(){
 	gulp.start('js-concat', 'js-uglify');
 });
-
 
 // styles task
 gulp.task('styles', function(){
