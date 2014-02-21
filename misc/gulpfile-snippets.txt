@@ -1,0 +1,94 @@
+	jsDistFiles = 'dist/assets/js/*.js';
+
+
+// clean task
+gulp.task('cleanse', function(){
+	gulp.src(target.cleansingAreas)
+		.pipe(clean());
+});
+
+
+// bowerfiles task
+gulp.task('bowerFiles', function(){
+	bowerFiles()
+		.pipe(gulp.dest(jsComponentDistDir));
+});
+
+//list task
+gulp.task('lint', function(){
+	gulp.src(scriptFiles)
+		.pipe(jshint('.jshintrc'))
+		.pipe(jshint.reporter('default'));
+});
+
+
+// bower task
+gulp.task('bower', function(){
+	bower()
+		.pipe(gulp.dest(jsComponentDistDir));
+});
+
+
+   .pipe(rename(function(dir,base,ext){            // give the files a min suffix
+            var trunc = base.split('.')[0];
+            return trunc + '.min' + ext;
+        }))
+
+
+	
+
+
+
+/*
+gulp.task('watch', function(){
+	gulp.watch(scssFiles, function(){
+		gulp.start('sass');
+	});
+
+	gulp.watch(jsFileList, function(){
+		gulp.start('js');
+	});
+});
+
+gulp.task('default', function(){
+	gulp.start('clean','js', 'sass');
+
+});
+
+gulp.task('styles', function(){
+	gulp.start('clean','sass');
+
+});
+
+
+gulp.task('scripts', function(){
+	gulp.start('clean','js');
+
+});
+
+*/
+
+
+
+
+
+gulp.task('js', function() {
+  gulp.src('src/assets/js/togglepaneloffers.js')
+  	.pipe(concat(pkg.name + '.min.js'))
+  	.pipe(stripDebug())
+  	.pipe(uglify())
+  	.pipe(gulp.dest(target.jsDistDir));
+});
+
+
+
+
+
+
+
+
+
+  gulp.src('src/components/**/*.js')
+  	.pipe(concat('vendor.js'))
+  	.pipe(uglify())  	
+  	.pipe(gulp.dest(target.jsComponentDistDir));
