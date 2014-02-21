@@ -28,23 +28,27 @@ var gulp = require('gulp'),
 /*******************************************************************************
 2. FILE DESTINATIONS (RELATIVE TO ASSSETS FOLDER)
 *******************************************************************************/
-var src_js_assets = 'src/assets/js',
-	src_scss_assets = 'src/assets/scss'
+var path = {
+	jsDist : 'dist/assets/js',
+	cssDist : 'dist/assets/css',
+	jsSrc : 'src/assets/js',
+	sassSrc : 'src/assets/scss'
+};
 
 var target = {
-	sassDirSrc : 'src/assets/scss/**/*.scss',				// all sass files
+	sassDirSrc : path.sassSrc + '/**/*.scss',				// all sass files
 	cssDirDist : 'dist/assets/css',					// where to put minified css
 	cssDistFile : pkg.name + '.min.css',			// css output file name
 	cssComponentFilesSrc : [
 		'src/assets/components/normalize-css/normalize.css'		
 	],
-	cssComponentDirDist : 'dist/assets/components',
+	cssComponentDirDist : 'dist/assets/components',	
 	jsLintFilesSrc : [
-		'src/assets/js/global.js',
-		'src/assets/js/togglepaneloffers.js',
-		'src/assets/js/zipandoffers.js',
-		'src/assets/js/euc.js',
-		'src/assets/js/ajax.js'
+		path.jsSrc + '/global.js',
+		path.jsSrc + '/togglepaneloffers.js',
+		path.jsSrc + '/zipandoffers.js',
+		path.jsSrc + '/euc.js',
+		path.jsSrc + '/ajax.js'
 	],							// all js that should be linted
 	jsUglifyFilesSrc : [
 		'src/assets/components/jquery/jquery.js',
@@ -76,13 +80,13 @@ gulp.task('sass', function() {
 			lineNumbers: true
 		}))
 		.pipe(rename(pkg.name + '.css'))
-		.pipe(gulp.dest(target.cssDirDist))
+		.pipe(gulp.dest(path.cssDist))
 		.pipe(rename(pkg.name + '.min.css'))
 		.pipe(sass({
 			style: 'compressed',
 			lineNumbers: false
 		}))		
-		.pipe(gulp.dest(target.cssDirDist));
+		.pipe(gulp.dest(path.cssDist));
 });
 
 /*******************************************************************************
@@ -137,14 +141,22 @@ gulp.task('default', function(){
 	});	
 });
 
+
+
+
 // clean task
 gulp.task('cleanse', function(){
 	gulp.src(target.cleansingAreas)
 		.pipe(clean());
 });
 
+// scripts task
+gulp.task('scripts', function(){
+	gulp.start('js-concat', 'js-uglify');
+});
 
 
+// styles task
 gulp.task('styles', function(){
 	gulp.start('cleanse','sass');
 
