@@ -70,15 +70,20 @@ var target = {
 3. SASS TASK  -- working rmf 2/21
 *******************************************************************************/
 gulp.task('sass', function() {
-	gulp.src(['src/scss/kickoff.scss'])
+	gulp.src(['src/assets/scss/kickoff.scss'])
 		.pipe(sass({
 			style: 'expanded',
-			lineNumbers: false
+			lineNumbers: true
 		}))
-		.pipe(rename(target.cssDistFile))
+		.pipe(rename(pkg.name + '.css'))
+		.pipe(gulp.dest(target.cssDirDist))
+		.pipe(rename(pkg.name + '.min.css'))
+		.pipe(sass({
+			style: 'compressed',
+			lineNumbers: false
+		}))		
 		.pipe(gulp.dest(target.cssDirDist));
 });
-
 
 /*******************************************************************************
 4. JS TASKS
@@ -96,7 +101,6 @@ gulp.task('js-uglify', function() {
         .pipe(uglify())                                 // uglify the files   	
         .pipe(gulp.dest(target.jsDirDist))                // where to put the files
 });
-
 
 // minify & concatinate all other js
 gulp.task('js-concat', function() {
