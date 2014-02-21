@@ -1,6 +1,12 @@
 'use strict';
 
+/*******************************************************************************
+1. DEPENDENCIES
+*******************************************************************************/
+// Include gulp
 var gulp = require('gulp'),
+
+// Include Plugins
 	pkg = require('./package.json'),
 	bower = require('gulp-bower'),
 	bowerFiles = require("gulp-bower-files"),
@@ -18,57 +24,56 @@ var gulp = require('gulp'),
 	server = lr()
 ;
 
+/*******************************************************************************
+2. FILE DESTINATIONS (RELATIVE TO ASSSETS FOLDER)
+*******************************************************************************/
+var target = {
+	sassDirSrc : 'src/scss/**/*.scss',				// all sass files
+	cssDirDist : 'dist/assets/css',					// where to put minified css
+	cssDistFile : pkg.name + '.min.css',			// css output file name
+	cssComponentFilesSrc : [
+		'src/components/normalize-css/normalize.css'		
+	],
+	cssComponentDirDist : 'dist/assets/components',
+	jsLintFilesSrc : [],							// all js that should be linted
+	jsUglifyFilesSrc :[],							// all js files that should not be concatinated
+	jsConcactFilesSrc : [],							// all js files that should be concatinated
+	jsSrcFileList : [],								// JS files to include
+	jsDistFile : pkg.name + '.min.js',				// compiled JS files
+	jsDirDist : 'dist/assets/js',					// where to put minified js
+	jsComponentFilesSrc : [
+		'src/components/modernizr/modernizr.js'		
+	],
+	jsComponentDirDist : 'dist/assets/components', 	// where to put componet js (minified) js
+	cleansingAreas : [
+		'dist/assets/js/*.js',
+		'dist/assets/css/*.css',		
+		'dist/assets/components/*'		
+	]
+};
 
-var scriptFiles = 'src/**/*.js';
-var scssFiles = 'src/**/*.scss',
-	scssFile = 'src/scss/mysite.scss',
-	cssSourceFile = pkg.name + '.min.css';
-
-var jsComponentFiles = [
-	'src/components/*.js'
-];
-
-var jsComponentDistDir = 'dist/assets/components';
-
-var jsFileList = [
-	'src/js/file1.js',
-	'src/js/file2.js'
-];
-
-var jsDistDir = 'dist/assets/js',
-	jsDistFiles = 'dist/assets/js/*.js';
-
-var cssDistDir = 'dist/assets/css',
-	cssDistFiles = 'dist/assets/css/*.css';
-
-var componentsDistDir = 'dist/assets/components';
-
-
-var cleansingAreas = [
-	jsDistDir,
-	cssDistDir,
-	componentsDistDir
-];
-
-gulp.task('clean', function(){
-	gulp.src(cleansingAreas)
-		.pipe(clean());
+/*******************************************************************************
+3. SASS TASK
+*******************************************************************************/
+gulp.task('sass', function() {
+	gulp.src(['src/scss/kickoff.scss'])
+		.pipe(sass({
+			style: 'compressed',
+			lineNumbers: true
+		}))
+		.pipe(rename(target.cssDistFile))
+		.pipe(gulp.dest(target.cssDirDist));
 });
 
 
+/*******************************************************************************
+4. JS TASKS
+*******************************************************************************/
+// lint custom js
 
-gulp.task('bowerFiles', function(){
-	bowerFiles()
-		.pipe(gulp.dest(jsComponentDistDir));
-});
+// minify all js files that should not be concatinated
 
-
-gulp.task('lint', function(){
-	gulp.src(scriptFiles)
-		.pipe(jshint('.jshintrc'))
-		.pipe(jshint.reporter('default'));
-});
-
+// minify & concatinate all other js
 
 gulp.task('js', function() {
   gulp.src(scriptFiles)
@@ -84,54 +89,38 @@ gulp.task('js', function() {
 });
 
 
-gulp.task('sass', function() {
-	gulp.src(scssFile)
-		.pipe(sass({
-			style: 'compressed',
-			lineNumbers: true
-		}))
-		.pipe(rename(cssSourceFile))
-		.pipe(gulp.dest(cssDistDir));
-});
 
 
 
-gulp.task('bower', function(){
-	bower()
-		.pipe(gulp.dest(jsComponentDistDir));
-});
-
-
-
-
-
-
-
-
-
-
-gulp.task('watch', function(){
-	gulp.watch(scssFiles, function(){
-		gulp.start('sass');
-	});
-
-	gulp.watch(jsFileList, function(){
-		gulp.start('js');
-	});
-});
-
+/*******************************************************************************
+5. GULP TASKS
+*******************************************************************************/
+// default task
 gulp.task('default', function(){
-	gulp.start('clean','js', 'sass');
-
+	gulp.start('sass', 'js-lint', 'js-uglify', 'js-concat', 'browser-sync');
+	gulp.watch('scss/**/*.scss', function() {
+	    gulp.start('sass');
+	});
+	gulp.watch(target.js_lint_src, function() {
+	    gulp.start('js-lint');
+	});
+	gulp.watch(target.js_minify_src, function() {
+	    gulp.start('js-uglify');
+	});
+	gulp.watch(target.js_concat_src, function() {
+	    gulp.start('js-concat');
+	});	
 });
+
+// clean task
+gulp.task('cleanse', function(){
+	gulp.src(target.cleansingAreas)
+		.pipe(clean());
+});
+
+
 
 gulp.task('styles', function(){
-	gulp.start('clean','sass');
-
-});
-
-
-gulp.task('scripts', function(){
-	gulp.start('clean','js');
+	gulp.start('cleanse','sass');
 
 });
