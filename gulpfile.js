@@ -23,6 +23,7 @@ var gulp = require('gulp'),		// gulp core
 	uglify = require('gulp-uglify'),					// uglifies the js
 	rename = require('gulp-rename'),					// rename files
 	browserSync = require('browser-sync'),              // inject code to all devices
+	spritesmith = require('gulp.spritesmith'),					// sprite images
 	lr = require('tiny-lr'),
 	server = lr()
 ;
@@ -42,7 +43,8 @@ var target = {
 	cssDirDist : 'dist/assets/css',					// where to put minified css
 	cssDistFile : pkg.name + '.min.css',			// css output file name
 	cssComponentFilesSrc : [
-		'src/assets/components/normalize-css/normalize.css'		
+		'src/assets/components/normalize-css/normalize.css',
+		'src/assets/components/modernizr.js'		
 	],
 	cssComponentDirDist : 'dist/assets/components',	
 	jsLintFilesSrc : [
@@ -75,30 +77,51 @@ var target = {
 /*******************************************************************************
 3. SASS TASK  -- working rmf 2/21
 *******************************************************************************/
-gulp.task('sass', function() {
-	gulp.src(['src/assets/scss/kickoff.scss'])
+gulp.task('sa', function() {
+	gulp.src(['src/assets/scss/screen.scss'])
 		.pipe(plumber())
 		.pipe(sass({
 			style: 'expanded',
-			lineNumbers: true
+			lineNumbers: true,
+			compass: true
 		}))
 		.pipe(autoprefixer(
-            'last 2 version',
-            '> 1%',
-            'ie 8',
-            'ie 9',
-            'ios 6',
-            'android 4'
+            'last 2 version'
 		))
 		.pipe(rename(pkg.name + '.css'))
 		.pipe(gulp.dest(path.cssDist))
 		.pipe(rename(pkg.name + '.min.css'))
 		.pipe(sass({
 			style: 'compressed',
+			lineNumbers: false,
+			compass: true
+		}))		
+		.pipe(gulp.dest(path.cssDist));
+});
+
+
+gulp.task('sass', function() {
+	gulp.src('src/assets/scss/screen.scss')
+		.pipe(sass({
+			compass: true,
+			style: 'expanded',
+			lineNumbers: true
+		}))
+		.pipe(autoprefixer(
+            'last 3 versions'
+		))
+		.pipe(rename(pkg.name + '.css'))
+		.pipe(gulp.dest(path.cssDist))
+		.pipe(rename(pkg.name + '.min.css'))
+		.pipe(sass({
+			compass: true,
+			style: 'compressed',
 			lineNumbers: false
 		}))		
 		.pipe(gulp.dest(path.cssDist));
 });
+
+
 
 /*******************************************************************************
 4. JS TASKS
@@ -129,8 +152,30 @@ gulp.task('js-concat', function() {
 });
 
 
+
 /*******************************************************************************
-5. BROWSER SYNC
+5. SPRITES
+*******************************************************************************/
+gulp.task('sprite', function () {
+    var spriteData = gulp.src('images/social/*.png')
+    	.pipe(spritesmith({    		
+    		imgName : 'social.png',
+    		cssName : 'social.scss',
+    		cssFormat: 'scss',
+		    cssClass: function (sprite) {
+		      // `sprite` has `name`, `image` (full path), `x`, `y`
+		      //   `width`, `height`, `total_width`, `total_height`
+		      // EXAMPLE: Prefix all sprite names with 'sprite-'
+		      sprite.name = 'sprite-' + sprite.name;
+    		}	
+    	}));
+    	spriteData.img.pipe(gulp.dest('images/sprites2'));
+		spriteData.css.pipe(gulp.dest('src/assets/scss/sprites2/'));
+});
+
+
+/*******************************************************************************
+6. BROWSER SYNC
 *******************************************************************************/
 
 gulp.task('browser-sync', function() {
@@ -144,7 +189,7 @@ gulp.task('browser-sync', function() {
 
 
 /*******************************************************************************
-6. GULP TASKS
+7. GULP TASKS
 *******************************************************************************/
 // default task
 gulp.task('default', function(){
@@ -179,6 +224,7 @@ gulp.task('scripts', function(){
 
 // styles task
 gulp.task('styles', function(){
-	gulp.start('cleanse','sass');
-
+	gulp.start('sass');
 });
+
+gulp.task('dev', ['scripts','styles']);
