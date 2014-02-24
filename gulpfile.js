@@ -133,14 +133,14 @@ gulp.task('js-lint', function() {
         .pipe(jshint.reporter(stylish))                 // present the results in a beautiful way
 });
 
-// minify all js files that should not be concatinated  -- working rmf 2/21
+// minify all js files that should not be concatinated
 gulp.task('js-uglify', function() {
     gulp.src(target.jsUglifyFilesSrc)                      // get the files
         .pipe(uglify())                                 // uglify the files   	
         .pipe(gulp.dest(target.jsDirDist))                // where to put the files
 });
 
-// minify & concatinate all other js  -- working rmf 2/21
+// minify & concatinate all other js
 gulp.task('js-concat', function() {
   return gulp.src(target.jsLintFilesSrc)				// get the files
   	.pipe(concat(pkg.name + '.js'))  					// concatinate to one file
@@ -208,9 +208,7 @@ gulp.task('default', function(){
 	});	
 });
 
-gulp.task('nowatch', function(){
-	gulp.start('sass', 'js-lint', 'js-uglify', 'js-concat');
-});
+
 
 
 // clean task
